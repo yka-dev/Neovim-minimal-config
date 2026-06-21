@@ -45,6 +45,8 @@ vim.opt.shiftwidth = CONFIG.tab_size
 vim.opt.tabstop = CONFIG.tab_size
 vim.opt.expandtab = true
 
+vim.opt.clipboard = "unnamedplus"
+
 local function apply_transparency()
 	vim.cmd([[
       highlight Normal guibg=none ctermbg=none
@@ -85,7 +87,7 @@ vim.opt.rtp:prepend(lazypath)
 -- ========================================================================== --
 require("lazy").setup({
 
-	-- Theme: Kanagawa 
+	-- Theme: Kanagawa
 	{
 		"rebelot/kanagawa.nvim",
 		lazy = false,
@@ -113,7 +115,7 @@ require("lazy").setup({
 		"stevearc/oil.nvim",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		cmd = "Oil",
-        lazy = false,
+		lazy = false,
 		keys = { { CONFIG.keymaps.open_file_manager, "<CMD>Oil<CR>", desc = "Open parent directory" } },
 		config = function()
 			require("oil").setup({ view_options = { show_hidden = true } })
@@ -189,6 +191,22 @@ require("lazy").setup({
 					enable_close_on_slash = true,
 				},
 			})
+		end,
+	},
+
+    -- Autopairs
+	{
+		"windwp/nvim-autopairs",
+		event = { "BufReadPost", "BufNewFile" },
+		config = function()
+			local autopairs = require("nvim-autopairs")
+
+			autopairs.setup({
+				check_ts = true, -- Treesitter integration
+			})
+
+			-- Optional: Fast-wrap feature (allows you to wrap existing text in braces)
+			-- autopairs.enable_fast_wrap()
 		end,
 	},
 
