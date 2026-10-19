@@ -9,6 +9,8 @@ local CONFIG = {
 		"vtsls",
 		"ols",
 		"jsonls",
+		"gopls",
+		"zls",
 	},
 	formatters = {
 		"stylua",
@@ -194,7 +196,7 @@ require("lazy").setup({
 		end,
 	},
 
-    -- Autopairs
+	-- Autopairs
 	{
 		"windwp/nvim-autopairs",
 		event = { "BufReadPost", "BufNewFile" },
@@ -322,17 +324,25 @@ require("lazy").setup({
 
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-			require("mason-lspconfig").setup({
-				ensure_installed = CONFIG.lsp_servers,
-				handlers = {
-					function(server_name)
-						require("lspconfig")[server_name].setup({
-							capabilities = capabilities,
-						})
-					end,
+			-- Applies to all servers
+			vim.lsp.config("*", { capabilities = capabilities })
+
+			-- clangd override
+			vim.lsp.config("clangd", {
+				cmd = {
+					"clangd",
+					"--query-driver=" .. table.concat({
+						vim.env.HOME .. "/.platformio/packages/**/bin/*",
+						"/usr/bin/*",
+					}, ","),
 				},
 			})
 
+			-- Configure BEFORE this so the settings are in place when servers are enabled
+			require("mason-lspconfig").setup({
+				ensure_installed = CONFIG.lsp_servers,
+				automatic_enable = true, -- default in v2
+			})
 			require("mason-tool-installer").setup({ ensure_installed = CONFIG.formatters })
 
 			vim.api.nvim_create_autocmd("LspAttach", {
