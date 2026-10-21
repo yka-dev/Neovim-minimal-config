@@ -329,13 +329,20 @@ require("lazy").setup({
 
 			-- clangd override
 			vim.lsp.config("clangd", {
-				cmd = {
-					"clangd",
-					"--query-driver=" .. table.concat({
-						vim.env.HOME .. "/.platformio/packages/**/bin/*",
-						"/usr/bin/*",
-					}, ","),
-				},
+				cmd = function(dispatchers, config)
+					local cmd = { "clangd" }
+
+					local root = config.root_dir
+					if root and vim.uv.fs_stat(root .. "/platformio.ini") then
+						table.insert(cmd, "--query-driver=" .. vim.env.HOME .. "/.platformio/packages/**/bin/*")
+					end
+
+					return vim.lsp.rpc.start(cmd, dispatchers, {
+						cwd = config.cmd_cwd,
+						env = config.cmd_env,
+						detached = config.detached,
+					})
+				end,
 			})
 
 			-- Configure BEFORE this so the settings are in place when servers are enabled
