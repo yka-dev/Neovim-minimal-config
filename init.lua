@@ -330,7 +330,7 @@ require("lazy").setup({
 			-- clangd override
 			vim.lsp.config("clangd", {
 				cmd = {
-					"/opt/homebrew/opt/llvm/bin/clangd",
+					"clangd",
 					"--experimental-modules-support",
 					"--background-index",
 					"--compile-commands-dir=build",
